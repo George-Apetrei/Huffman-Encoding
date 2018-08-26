@@ -3,6 +3,7 @@ Program that does a huffman encoding
 Coded in C++
 
 It can:
+
 1 - Encode a sentence, given the sentence, symbols to encode with and distribution
 
 2 - Encode a set of symbols, given the symbols, probabilities, symbols to encode with and distribution
