@@ -18,47 +18,47 @@ using DATA = struct data;
 
 DATA Analysis(DATA to_analyse)
 {
-	int exists=0;
-	int total=0;
+	int exists = 0;
+	int total = 0;
 	std::string word;
-	int i = 0,pos=0;
+	int i = 0, pos = 0;
 	//Count all the individual symbol used in the sentence, register each unique symbol in a vector, and count the number of times they are encountered in a vector of int. The positions of symbol and symbol counter are 
 	while (pos < to_analyse.sentence.size()) {
-	while (to_analyse.sentence[i] != ' '&&to_analyse.sentence[i] != '\0'&&to_analyse.sentence[i]!='\n') {
-	i++;
-	}
-	for (int j = 0; j < to_analyse.symbol.size(); ++j) {
-	if (to_analyse.sentence.compare(pos+1, i-pos-1, to_analyse.symbol[j]) == 0) {
-	to_analyse.symbol_counter[j]++;
-	exists = 1;
-	break;
-	}
-	else {
-	exists = 0;
-	}
-	}
-	if (exists == 0) {
-	to_analyse.symbol_counter.push_back(1);
-	if (pos == 0) {
-		to_analyse.symbol.push_back(to_analyse.sentence.substr(pos, i - pos));
-	}
-	else {
-		to_analyse.symbol.push_back(to_analyse.sentence.substr(pos+1, i - pos-1));
+		while (to_analyse.sentence[i] != ' '&&to_analyse.sentence[i] != '\0'&&to_analyse.sentence[i] != '\n') {
+			i++;
+		}
+		for (int j = 0; j < to_analyse.symbol.size(); ++j) {
+			if (to_analyse.sentence.compare(pos + 1, i - pos - 1, to_analyse.symbol[j]) == 0) {
+				to_analyse.symbol_counter[j]++;
+				exists = 1;
+				break;
+			}
+			else {
+				exists = 0;
+			}
+		}
+		if (exists == 0) {
+			to_analyse.symbol_counter.push_back(1);
+			if (pos == 0) {
+				to_analyse.symbol.push_back(to_analyse.sentence.substr(pos, i - pos));
+			}
+			else {
+				to_analyse.symbol.push_back(to_analyse.sentence.substr(pos + 1, i - pos - 1));
+			}
+
+		}
+
+		pos = i;
+		i++;
 	}
 
+	//Calculate the probabilities of each symbol appearing
+	for (int i = 0; i < to_analyse.symbol_counter.size(); ++i) {
+		to_analyse.symbol_probabilities.push_back(static_cast<double>(to_analyse.symbol_counter[i]) / to_analyse.sentence.size());
 	}
 
-	pos = i;
-	i++;
-	}
 
-//Calculate the probabilities of each symbol appearing
-for (int i = 0; i < to_analyse.symbol_counter.size(); ++i) {
-	to_analyse.symbol_probabilities.push_back(static_cast<double>(to_analyse.symbol_counter[i]) / to_analyse.sentence.size());
-}
-
-
-return to_analyse;
+	return to_analyse;
 }
 //Bubble sort
 DATA sorting(DATA info) {
@@ -78,7 +78,7 @@ DATA sorting(DATA info) {
 				info.symbol_probabilities[i] = info.symbol_probabilities[i + 1];
 				info.symbol_probabilities[i + 1] = the_d;
 				swap++;
-				none = 1;				
+				none = 1;
 			}
 		}
 		if (none == 1)
@@ -110,14 +110,11 @@ int check_size(int number_of_probabilities, int number_of_symbols, int * steps)
 
 //Function to encode symbols, end result of which is codes for each symbol
 DATA encoding(DATA info) {
-	info = sorting(info);
 	//Step 1: Reorder the probabilities from highest to lowest
-	//info = sorting(info);
+	info = sorting(info);
 	//Step 2: Determine if the size of the array of probabilities allows for encoding of X symbols, and the steps in which it will encode
 	int check = 0, *steps = new int;
 	*steps = 0;
-	//Only try to find a new size if encoding with more than 2 symbols
-	if (info.symbol_to_encode.size() > 2) {
 		while (1) {
 			check = check_size(info.symbol_probabilities.size(), info.symbol_to_encode.size(), steps);
 			if (check == 1) {
@@ -128,8 +125,9 @@ DATA encoding(DATA info) {
 				*steps = 0;
 			}
 		}
-	}
+
 	//Step 3: Determine the code symbol for all of the symbols
+
 	std::vector<std::vector<double>> probabilities;					//Holds all the probabilities during calculation
 	std::vector < std::vector<std::string>> symbols;				//Holds all the symbols during calculation
 	std::vector<char> symbols_used_in_calculations;					//Holds all the symbols that are used to mark the sum of the previous row
@@ -155,7 +153,7 @@ DATA encoding(DATA info) {
 
 	char c = 'A';		//Used in identifying the sums
 	char number = '0';	//Used in filling the symbols with a number corresponding to the symbols to encode by
-	double aux=0;			//Used in swapping positions for numbers
+	double aux = 0;			//Used in swapping positions for numbers
 	std::string aux_symbol;			//Used in swapping positions for symbols
 	//Start of encoding
 	for (int i = 0; i < *steps - 1; ++i) {
@@ -170,9 +168,9 @@ DATA encoding(DATA info) {
 			probabilities[i + 1][probabilities[i + 1].size() - 1] += probabilities[i][(probabilities[i].size() - info.symbol_to_encode.size()) + j];
 		}
 		//Copy to the next row previous symbols up to the size of the probabilities vector
-		for (int j = 0; j < probabilities[i + 1].size()-1; ++j){
-			symbols[i+1].push_back(symbols[i][j]);
-}
+		for (int j = 0; j < probabilities[i + 1].size() - 1; ++j) {
+			symbols[i + 1].push_back(symbols[i][j]);
+		}
 		//Push back empty spot for the sum element
 		symbols[i + 1].push_back(std::string());
 		//Associate the sum with a symbol
@@ -187,18 +185,18 @@ DATA encoding(DATA info) {
 		if (info.distribution == 0) {
 			//If distribution is minimum
 			for (int j = 0; j < probabilities[i + 1].size(); ++j) {
-				if (((probabilities[i + 1].size() - j - 1)<0)||(probabilities[i + 1][probabilities[i + 1].size() - j - 2] >= probabilities[i + 1][probabilities[i + 1].size() - j-1])) {
+				if (((probabilities[i + 1].size() - j - 1) < 0) || (probabilities[i + 1][probabilities[i + 1].size() - j - 2] >= probabilities[i + 1][probabilities[i + 1].size() - j - 1])) {
 					break;
 				}
 				else {
-//Swap probabilities
-aux = probabilities[i + 1][probabilities[i + 1].size() - 2 - j];
-probabilities[i + 1][probabilities[i + 1].size() - 2 - j] = probabilities[i + 1][probabilities[i + 1].size() - j - 1];
-probabilities[i + 1][probabilities[i + 1].size() - j - 1] = aux;
-//Swap symbols
-aux_symbol = symbols[i + 1][symbols[i + 1].size() - 2 - j];
-symbols[i + 1][symbols[i + 1].size() - 2 - j] = symbols[i + 1][symbols[i + 1].size() - j - 1];
-symbols[i + 1][symbols[i + 1].size() - j - 1] = aux_symbol;
+					//Swap probabilities
+					aux = probabilities[i + 1][probabilities[i + 1].size() - 2 - j];
+					probabilities[i + 1][probabilities[i + 1].size() - 2 - j] = probabilities[i + 1][probabilities[i + 1].size() - j - 1];
+					probabilities[i + 1][probabilities[i + 1].size() - j - 1] = aux;
+					//Swap symbols
+					aux_symbol = symbols[i + 1][symbols[i + 1].size() - 2 - j];
+					symbols[i + 1][symbols[i + 1].size() - 2 - j] = symbols[i + 1][symbols[i + 1].size() - j - 1];
+					symbols[i + 1][symbols[i + 1].size() - j - 1] = aux_symbol;
 				}
 			}
 		}
@@ -227,49 +225,49 @@ symbols[i + 1][symbols[i + 1].size() - j - 1] = aux_symbol;
 		}
 		//Reset number for next row
 		number = '0';
-}
-
-//2nd loop, distribute the symbols to their correct spot
-//For number of rows
-for (int i = 0; i < symbols.size(); ++i) {
-	//If row exists below
-	if (symbols.size() - i - 2 == -1) {
-		//If true, it means the end of the distribution
-		break;
 	}
-	else {
-		//If false, distribute to the row below
-		//For number of columns, starting from the last row
-		for (int j = 0; j < symbols[symbols.size() - 1 - i].size(); ++j)
+
+	//2nd loop, distribute the symbols to their correct spot
+	//For number of rows
+	for (int i = 0; i < symbols.size(); ++i) {
+		//If row exists below
+		if (symbols.size() - i - 2 == -1) {
+			//If true, it means the end of the distribution
+			break;
+		}
+		else {
+			//If false, distribute to the row below
+			//For number of columns, starting from the last row
+			for (int j = 0; j < symbols[symbols.size() - 1 - i].size(); ++j)
 
 
 
-			//For comparing row below
-			for (int m = 0; m < symbols[symbols.size() - 2 - i].size(); ++m) {
-				//If the first char on the upper column is the same as the last char on the bottom column
-				if ((symbols[symbols.size() - 1 - i][j][0]) == (symbols[symbols.size() - 2 - i][m][symbols[symbols.size() - 2 - i][m].size() - 1])) {
-					//For the size of the rest of the string at the upper column being compared
-					for (int p = 1; p < (symbols[symbols.size() - 1 - i][j].size()); ++p) {
-						//Push back into the column below everything else
-						symbols[symbols.size() - 2 - i][m].push_back(symbols[symbols.size() - 1 - i][j][p]);
+				//For comparing row below
+				for (int m = 0; m < symbols[symbols.size() - 2 - i].size(); ++m) {
+					//If the first char on the upper column is the same as the last char on the bottom column
+					if ((symbols[symbols.size() - 1 - i][j][0]) == (symbols[symbols.size() - 2 - i][m][symbols[symbols.size() - 2 - i][m].size() - 1])) {
+						//For the size of the rest of the string at the upper column being compared
+						for (int p = 1; p < (symbols[symbols.size() - 1 - i][j].size()); ++p) {
+							//Push back into the column below everything else
+							symbols[symbols.size() - 2 - i][m].push_back(symbols[symbols.size() - 1 - i][j][p]);
+						}
 					}
 				}
-			}
-	}
+		}
 
-}
-//3rd loop, register the code value for each symbol
-for (int i = 0; i < info.symbol.size(); ++i) {
-	info.symbol_code.push_back(std::string());
-}
-for (int i = 0; i < info.symbol.size(); ++i) {
-	for (int j = 0; j < symbols[0][i].size(); ++j) {
-		if ((symbols[0][i][symbols[0][i].size() - j - 1] > '/') &&(symbols[0][i][symbols[0][i].size()-j-1] < ':')) {
-			info.symbol_code[i].append(info.symbol_to_encode[symbols[0][i][symbols[0][i].size() - j - 1] - '0']);
+	}
+	//3rd loop, register the code value for each symbol
+	for (int i = 0; i < info.symbol.size(); ++i) {
+		info.symbol_code.push_back(std::string());
+	}
+	for (int i = 0; i < info.symbol.size(); ++i) {
+		for (int j = 0; j < symbols[0][i].size(); ++j) {
+			if ((symbols[0][i][symbols[0][i].size() - j - 1] > '/') && (symbols[0][i][symbols[0][i].size() - j - 1] < ':')) {
+				info.symbol_code[i].append(info.symbol_to_encode[symbols[0][i][symbols[0][i].size() - j - 1] - '0']);
+			}
 		}
 	}
-}
-return info;
+	return info;
 }
 
 //Function with the purpose of converting a sentence from words to their symbols, encodes the symbol-sentence to "encoded
@@ -278,7 +276,7 @@ DATA write_sentence_as_code(DATA info) {
 	std::string sentence = info.sentence;
 
 	int exists = 0;
-	int pos = 0,i=0;
+	int pos = 0, i = 0;
 	std::string test;
 	while (pos < info.sentence.size()) {
 		while (info.sentence[i] != ' '&&info.sentence[i] != '\0'&&info.sentence[i] != '\n') {
@@ -286,7 +284,7 @@ DATA write_sentence_as_code(DATA info) {
 		}
 		for (int j = 0; j < info.symbol.size(); ++j) {
 			if (pos > 0) {
-				if (info.sentence.compare(pos + 1, i - pos-1, info.symbol[j]) == 0) {
+				if (info.sentence.compare(pos + 1, i - pos - 1, info.symbol[j]) == 0) {
 					test.append(info.symbol_code[j]);
 					exists = 1;
 					break;
@@ -305,7 +303,7 @@ DATA write_sentence_as_code(DATA info) {
 					exists = 0;
 				}
 			}
-			
+
 		}
 		if (exists == 0) {
 			exit;
@@ -327,7 +325,7 @@ DATA decode(DATA info) {
 
 		for (int j = 0; j < info.symbol.size(); ++j) {
 
-			if (sentence.compare(pos, info.symbol_code[j].size(), info.symbol_code[j])==0 ){
+			if (sentence.compare(pos, info.symbol_code[j].size(), info.symbol_code[j]) == 0) {
 				sentence.replace(pos, info.symbol_code[j].size(), info.symbol[j]);
 				test.append(info.symbol[j]);
 				test.append(" ");
@@ -340,7 +338,7 @@ DATA decode(DATA info) {
 			}
 		}
 		if (exists == 0) {
-			std::cout<<"Sentence or words input are invalid";
+			std::cout << "Sentence or words input are invalid";
 			break;
 		}
 	}
@@ -370,19 +368,19 @@ void Output_File(DATA info) {
 	//Symbols used
 	output << n << ":Symbols, size: " << info.symbol.size() << std::endl;
 	for (int i = 0; i < info.symbol.size(); ++i) {
-			output << info.symbol[i] << std::endl;
+		output << info.symbol[i] << std::endl;
 	}
 	n++;
 	//Symbol Probabilities
 	output << n << ":Probabilities\n";
 	for (int i = 0; i < info.symbol_probabilities.size(); ++i) {
-			output << info.symbol_probabilities[i] << std::endl;
+		output << info.symbol_probabilities[i] << std::endl;
 	}
 	n++;
 	//Symbol Code
 	output << n << ":Symbol Code\n";
 	for (int i = 0; i < info.symbol_code.size(); ++i) {
-			output << info.symbol_code[i] << std::endl;
+		output << info.symbol_code[i] << std::endl;
 	}
 	n++;
 	//Symbol to encode
@@ -399,7 +397,7 @@ void Output_File(DATA info) {
 }
 
 //Function that handles all inputs necessary
-DATA input(DATA info,int choice) {
+DATA input(DATA info, int choice) {
 	int i;
 	double probabilities;
 	std::string input;
@@ -412,7 +410,7 @@ DATA input(DATA info,int choice) {
 		std::cin >> i;
 		clear();
 		std::cout << "Input symbols to encode with, everything you have written up until you press enter is counted as a symbol\n";
-		for (int j = 0; j < i; ++j)  {
+		for (int j = 0; j < i; ++j) {
 			std::cout << j + 1 << ": ";
 			getline(std::cin, input);
 			info.symbol_to_encode.push_back(input);
@@ -487,11 +485,11 @@ int main()
 		coding = write_sentence_as_code(coding);
 		break;
 	case 2:
-		coding=input(coding, choice);
+		coding = input(coding, choice);
 		coding = encoding(coding);
 		break;
 	case 3:
-		coding=input(coding, choice);
+		coding = input(coding, choice);
 		coding = decode(coding);
 		std::cout << "The decoded sentence is:\n" << coding.sentence << std::endl << std::endl;
 		break;
@@ -501,6 +499,5 @@ int main()
 
 	std::cout << "Data has been processed and output to the \"Data.txt\" file in the same folder as the executable\nPress Enter to exit program\n";
 	getline(std::cin, coding.sentence);
-    return 0;
+	return 0;
 }
-
