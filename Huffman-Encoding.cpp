@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -45,7 +44,6 @@ DATA Analysis(DATA to_analyse)
 			else {
 				to_analyse.symbol.push_back(to_analyse.sentence.substr(pos + 1, i - pos - 1));
 			}
-
 		}
 
 		pos = i;
@@ -56,8 +54,6 @@ DATA Analysis(DATA to_analyse)
 	for (int i = 0; i < to_analyse.symbol_counter.size(); ++i) {
 		to_analyse.symbol_probabilities.push_back(static_cast<double>(to_analyse.symbol_counter[i]) / to_analyse.sentence.size());
 	}
-
-
 	return to_analyse;
 }
 //Bubble sort
@@ -115,6 +111,9 @@ DATA encoding(DATA info) {
 	//Step 2: Determine if the size of the array of probabilities allows for encoding of X symbols, and the steps in which it will encode
 	int check = 0, *steps = new int;
 	*steps = 0;
+
+	//Loop to determine the number of steps until the encoding will be complete
+	if (info.symbol_to_encode.size() > 2) {
 		while (1) {
 			check = check_size(info.symbol_probabilities.size(), info.symbol_to_encode.size(), steps);
 			if (check == 1) {
@@ -125,6 +124,10 @@ DATA encoding(DATA info) {
 				*steps = 0;
 			}
 		}
+	}
+	else {
+		*steps = info.symbol_probabilities.size() - 1;
+	}
 
 	//Step 3: Determine the code symbol for all of the symbols
 
